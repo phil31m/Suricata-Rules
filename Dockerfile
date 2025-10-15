@@ -6,7 +6,7 @@ USER root
 # Install Suricata and Python
 RUN apt-get update && \
     apt-get install -y suricata python3 python3-pip && \
-    pip3 install suricata-language-server
+    pip3 install --break-system-packages suricata-language-server
 
 # Switch back to coder user
 USER coder
