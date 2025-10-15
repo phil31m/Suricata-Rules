@@ -1,22 +1,20 @@
-FROM codercom/code-server:latest
+# Use debian as base
+FROM debian:bookworm
 
-# Become root to install packages
-USER root
-
-# Install Suricata and Python
+# Install dependencies
 RUN apt-get update && \
-    apt-get install -y suricata python3 python3-pip && \
+    apt-get install -y curl suricata python3 python3-pip && \
     pip3 install --break-system-packages suricata-language-server
 
-# Switch back to coder user
-USER coder
+# Install code-server
+RUN curl -fsSL https://code-server.dev/install.sh | sh
 
-# Optional: preinstall some extensions (e.g., Python, JSON, YAML support)
-RUN code-server --install-extension ms-python.python
-RUN code-server --install-extension redhat.vscode-yaml
+# Create workspace
+RUN mkdir -p /workspace
+WORKDIR /workspace
 
-# Expose port
+# Expose the port
 EXPOSE 8080
 
-# Start code-server without auth (so anyone with link can access)
-CMD ["code-server", "--auth", "none", "--bind-addr", "0.0.0.0:8080", "/home/coder/project"]
+# Start code-server when container runs
+CMD ["code-server", "--bind-addr", "0.0.0.0:8080", "--auth", "none", "/workspace"]
